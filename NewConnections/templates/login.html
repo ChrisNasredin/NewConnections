@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<nav>
+    <i>Главная</i>
+    <a href="">Создать заявку</a>
+    <a href="">Вход</a>
+    <a href="">Выход</a>
+</nav>
+    <h1>Вход</h1>
+    <div>
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+             <p>
+                 {{ form.username.label }}
+                 {{ form.username }}
+                 {% for error in form.username.errors %}
+                    <span style="color: red">{{ error }}</span>
+                 {% endfor %}
+             </p>
+             
+             <p>
+                 {{ form.password.label }}
+                 {{ form.password }}
+                 {% for error in form.password.errors %}
+                    <span style="color: red">{{ error }}</span>
+                 {% endfor %}
+             </p>
+
+             <p>{{ form.remember }} {{ form.remember.label }}</p>
+             <p>{{ form.submit }}</p>
+
+        </form>
+    </div>
+{% endblock content %}
