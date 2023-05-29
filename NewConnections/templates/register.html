@@ -1,0 +1,18 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <h1>Регистрация нового пользователя</h1>
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.username.label }}
+            {{ form.username }}
+        </p>
+        <p>
+            {{ form.role.label }}
+            {{ form.role }}
+        </p>
+        <input type="submit" name="submit">   
+      </form>
+{% endblock content %}
+    
