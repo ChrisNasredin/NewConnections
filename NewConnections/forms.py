@@ -1,9 +1,9 @@
 from flask_wtf import FlaskForm, Form
 from wtforms import StringField, BooleanField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, EqualTo
-from wtforms_alchemy import ModelForm, ModelFieldList
-from .models import Users, Roles
-from wtforms.fields import FormField
+from wtforms_alchemy import QuerySelectMultipleField, QuerySelectField
+from.models import Roles
+
 
 class LoginForm(FlaskForm):
     username = StringField('Имя пользователя', validators=[DataRequired()])
@@ -11,15 +11,12 @@ class LoginForm(FlaskForm):
     remember = BooleanField('Запомнить меня')
     submit = SubmitField('Вход')
 
-# class RegisterForm(FlaskForm):
-#     username = StringField('Имя пользователя', validators=[DataRequired()])
-#     password = PasswordField('Пароль', validators=[DataRequired()])
-#     password2 = PasswordField('Повторить пароль'validators=[DataRequired(), EqualTo('password')])
-#     role = 
-#     submit = SubmitField('Регистрация')
-
-class RegisterForm(ModelForm, FlaskForm):
-    class Meta:
-        model = Users
-        exclude = ['password_hash']
-    role = ModelFieldList(FormField(Roles))
+class RegisterForm(FlaskForm):
+     username = StringField('Имя пользователя', validators=[DataRequired()])
+     password = PasswordField('Пароль', validators=[DataRequired()])
+     password2 = PasswordField('Повторить пароль', validators=[DataRequired(), EqualTo('password')])
+     role =QuerySelectField(query_factory=Roles.choice_roles, 
+                            allow_blank=False, 
+                            label='Права'
+                            )
+     submit = SubmitField('Регистрация')

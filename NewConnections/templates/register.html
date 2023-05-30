@@ -2,17 +2,28 @@
 
 {% block content %}
     <h1>Регистрация нового пользователя</h1>
-    <form method="post">
-        {{ form.hidden_tag() }}
+    <form method="post" action=''>
+        {{ form.csrf_token }}
         <p>
             {{ form.username.label }}
             {{ form.username }}
         </p>
         <p>
+            {{ form.password.label }}
+            {{ form.password }}
+        </p>
+        <p>
+            {{ form.password2.label }}
+            {{ form.password2 }}
+        </p>
+        <p>
             {{ form.role.label }}
             {{ form.role }}
         </p>
-        <input type="submit" name="submit">   
-      </form>
+        <p>
+            {{ form.submit.label }}
+            {{ form.submit }}
+        </p>
+    </form>
 {% endblock content %}
     

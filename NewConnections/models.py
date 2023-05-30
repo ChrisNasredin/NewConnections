@@ -13,7 +13,7 @@ class Users(db.Model):
         
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-    
+        
     def __repr__(self):
         return f'User {self.username}, role {self.role}'
     
@@ -22,6 +22,10 @@ class Users(db.Model):
 class Roles(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     role_desc = db.Column(db.String(256))
+    
+    @classmethod
+    def choice_roles(cls):
+        return cls.query.all()
     
     def __repr__(self):
         return self.role_desc
