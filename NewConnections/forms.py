@@ -20,3 +20,7 @@ class RegisterForm(FlaskForm):
                             label='Права'
                             )
      submit = SubmitField('Регистрация')
+     
+class StatusForm(FlaskForm):
+    status_desc = StringField('Новый статус:', validators=[DataRequired()])
+    submit = SubmitField('Добавить статус')

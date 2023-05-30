@@ -1,8 +1,9 @@
 from .import db
 from datetime import datetime
 from werkzeug.security import check_password_hash, generate_password_hash
+from flask_login import UserMixin
 
-class Users(db.Model):
+class Users(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(256), info={'label': 'Имя Пользователя'})
     password_hash = db.Column(db.String(256))
@@ -16,6 +17,9 @@ class Users(db.Model):
         
     def __repr__(self):
         return f'User {self.username}, role {self.role}'
+    
+    def get_id(self):
+        return Users.query.get(int(id))
     
     
     
@@ -33,6 +37,10 @@ class Roles(db.Model):
 class Statuses(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     status_desc = db.Column(db.String(256))
+    
+    def __repr__(self):
+        return self.status_desc
+    
     
 class Requests(db.Model):
     id = db.Column(db.Integer, primary_key=True)

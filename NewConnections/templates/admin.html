@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<nav>
+    <i>Главная</i>
+    <a href="">Создать заявку</a>
+    <a href="{{ url_for('login') }}">Вход</a>
+    <a href="">Выход</a>
+</nav>
+    <h1>Панель администратора</h1>
+    <h2>Статусы</h2>
+    {% if statuses %}
+        {% for status in statuses %}
+            <ul>
+                <li>{{ status }}</li>
+            </ul>
+        {% endfor %}
+    {% else %}
+        <i>Статусы отсутствут</i>
+    {% endif %}
+    <form action="" method="post">
+            {{ form_add_status.csrf_token }}
+        <p>{{ form_add_status.status_desc.label }}
+        {{ form_add_status.status_desc }}</p>
+        <p>{{ form_add_status.submit }}</p>
+    </form>
+{% endblock content %}
