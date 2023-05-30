@@ -1,7 +1,8 @@
 from . import app
-from flask import render_template, url_for, flash
+from flask import render_template, url_for, flash, redirect
 from .forms import LoginForm, RegisterForm, StatusForm
 from .services import create_new_user, get_statuses, add_status
+from flask_login import current_user, login_user
 
 @app.route('/')
 def index():
@@ -9,9 +10,13 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_autentificated:
+        redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
         pass
+        # Сюда нужно написать логику проверки имени и пароля
+        # Но пока не понятно, как работать с моделью
     return render_template('login.html', form=form)
 
 @app.route('/register', methods=['GET', 'POST'])

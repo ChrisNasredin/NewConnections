@@ -1,4 +1,5 @@
 from .import db
+from NewConnections import login
 from datetime import datetime
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
@@ -18,8 +19,9 @@ class Users(UserMixin, db.Model):
     def __repr__(self):
         return f'User {self.username}, role {self.role}'
     
-    def get_id(self):
-        return Users.query.get(int(id))
+@login.user_loader
+def get_id(id):
+        return Users.query.get(int(id))   
     
     
     
