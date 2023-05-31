@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm, Form
-from wtforms import StringField, BooleanField, PasswordField, SubmitField
+from wtforms import StringField, BooleanField, PasswordField, SubmitField, IntegerField
 from wtforms.validators import DataRequired, EqualTo
 from wtforms_alchemy import QuerySelectMultipleField, QuerySelectField
 from.models import Roles
@@ -24,3 +24,10 @@ class RegisterForm(FlaskForm):
 class StatusForm(FlaskForm):
     status_desc = StringField('Новый статус:', validators=[DataRequired()])
     submit = SubmitField('Добавить статус')
+    
+class NewRequestForm(FlaskForm):
+    address = StringField('Адрес подключения', validators=[DataRequired()])
+    name = StringField('ФИО', validators=[DataRequired()])
+    coordinates = StringField('Координаты')
+    phone = StringField('Телефон', validators=[DataRequired()])
+    submit = SubmitField('Создать')

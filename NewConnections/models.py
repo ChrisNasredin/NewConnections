@@ -20,7 +20,7 @@ class Users(UserMixin, db.Model):
         return f'User {self.username}, role {self.role}'
     
 @login.user_loader
-def get_id(id):
+def load_user(id):
         return Users.query.get(int(id))   
     
     
@@ -46,11 +46,12 @@ class Statuses(db.Model):
     
 class Requests(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    addresss = db.Column(db.String(256), index=True)
-    coordinates = db.Column(db.String(256), index=True)
+    address = db.Column(db.String(256), index=True)
+    name = db.Column(db.String(256), index=True)
+    coordinates = db.Column(db.String(256), index=True, nullable=True)
     phone = db.Column(db.String(13), index=True)
     timestap = db.Column(db.DateTime, default=datetime.now)
-    status_id = db.Column(db.Integer, db.ForeignKey('statuses.id'))
+    status_id = db.Column(db.Integer, db.ForeignKey('statuses.id'), default=1)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     
     
