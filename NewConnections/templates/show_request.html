@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <nav>
+        <a href="{{ url_for('index') }}">Главная</a>
+        <a href="{{ url_for('new') }}">Создать заявку</a>
+        {% if current_user.is_anonymous %}
+            <a href="{{ url_for('login') }}">Вход</a>
+        {% else %}
+            <i>[{{ current_user.username }}]</i>
+            <a href="{{ url_for('logout') }}">Выход</a>
+        {% endif %}
+    </nav>
+    <a href="{{ url_for('index') }}">Назад</a>
+    <div>
+        <table>
+            <tr>
+                <td>Адрес</td>
+                <td>{{ data.address }}</td>
+            </tr>
+            <tr>
+            <tr>
+                <td>ФИО</td>
+                <td>{{ data.name }}</td>
+            </tr>
+            <tr>
+                <td>Телефон</td>
+                <td>{{ data.phone }}</td>
+            </tr>
+            <tr>
+                <td>Статус</td>
+                <td>
+                    <form action="{{ url_for('edit_request', request_id=data.id)}}" method="post">
+                        {{ form.csrf_token }}
+                        {{ form.address(type="hidden") }}
+                        {{ form.name(type="hidden") }}
+                        {{ form.phone(type="hidden") }}
+                        {{ form.coordinates(type="hidden") }}
+                        {{ form.status }}
+                        {{ form.submit }}
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+{% endblock content %}

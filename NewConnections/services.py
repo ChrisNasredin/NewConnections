@@ -15,6 +15,7 @@ def add_status(status_name):
     new_status = Statuses(status_desc=status_name)
     db.session.add(new_status)
     db.session.commit()
+
     
     
 
@@ -35,4 +36,20 @@ def create_new_request(address, name, phone, coordinates, author_id):
                            coordinates=coordinates, 
                            author_id=author_id)
     db.session.add(new_request)
+    db.session.commit()
+    
+def get_request(request_id):
+    return Requests.query.get(int(request_id))
+
+def set_request_status(request_id, status_id):
+    request = Requests.query.get(int(request_id))
+    request.status_id=int(status_id)
+    db.session.commit()
+
+def delete_request(request_id):
+    request = Requests.query.get(int(request_id))
+    db.session.delete(request)
+    db.session.commit()
+
+def save():
     db.session.commit()

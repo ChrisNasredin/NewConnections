@@ -9,6 +9,7 @@ class Users(UserMixin, db.Model):
     username = db.Column(db.String(256), info={'label': 'Имя Пользователя'})
     password_hash = db.Column(db.String(256))
     role = db.Column(db.Integer, db.ForeignKey('roles.id'), info={'label': 'Роль'})
+    requests = db.relationship('Requests', backref='author', lazy='dynamic')
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -39,6 +40,12 @@ class Roles(db.Model):
 class Statuses(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     status_desc = db.Column(db.String(256))
+    requests = db.relationship('Requests', backref='status', lazy='dynamic')
+    
+    @classmethod
+    def get_statuses(cls):
+        return cls.query.all()
+        
     
     def __repr__(self):
         return self.status_desc

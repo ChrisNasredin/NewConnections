@@ -21,6 +21,7 @@
                 <td>Автор</td>
                 <td>Создана</td>
                 <td>Статус</td>
+                <td>Действия</td>
             </tr>
             {% for request in dataset %}
             <tr>
@@ -28,9 +29,14 @@
                 <td>{{ request.name }}</td>
                 <td>{{ request.phone }}</td>
                 <td>{{ request.coordinates }}</td>
-                <td>{{ request.author_id }}</td>
+                <td>{{ request.author.username }}</td>
                 <td>{{ request.timestap }}</td>
-                <td>{{ request.status_id }}</td>
+                <td>{{ request.status.status_desc }}</td>
+                <td>
+                    <a href="/request/{{ request.id }}">Просмотр</a>/
+                    <a href="/delete/{{ request.id }}">Удаление</a>/
+                    <a href="/edit/{{ request.id }}">Редактирование</a>
+                </td>
             </tr>
             {% endfor %}
         </table>
