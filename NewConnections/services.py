@@ -1,12 +1,35 @@
 from . import db
 from .models import Users, Statuses, Requests
+from flask_login import current_user, login_user, logout_user
 
-
-def create_new_user(username, password, role):
-    new_user = Users(username=username, role=role)
-    new_user.set_password(password)
-    db.session.add(new_user)
-    db.session.commit()
+class UserService:
+    
+    def create_new_user(self, username, password, role):
+        new_user = Users(username=username, role=role)
+        new_user.set_password(password)
+        db.session.add(new_user)
+        db.session.commit()
+        
+    def user_autentification(self, username, password):
+        user = Users.query.filter_by(username=username).first()
+        if user and user.check_password(password):
+            return user
+        else:
+            return False
+    
+class RequestService:
+    def create_new_request(self, address, name, phone, coordinates, author_id):
+        new_request = Requests(address=address, 
+                            name=name, 
+                            phone=phone, 
+                            coordinates=coordinates, 
+                            author_id=author_id)
+        db.session.add(new_request)
+        db.session.commit()
+        return 
+    
+    def get_request(self, request_id):
+        return Requests.query.get(int(request_id))
     
 def get_statuses():
     return Statuses.query.all()
@@ -15,31 +38,13 @@ def add_status(status_name):
     new_status = Statuses(status_desc=status_name)
     db.session.add(new_status)
     db.session.commit()
-
-    
-    
-
-def user_autentification(username, password):
-    user = Users.query.filter_by(username=username).first()
-    if user and user.check_password(password):
-        return user
-    else:
-        return False
     
 def get_dataset():
     return Requests.query.all()
 
-def create_new_request(address, name, phone, coordinates, author_id):
-    new_request = Requests(address=address, 
-                           name=name, 
-                           phone=phone, 
-                           coordinates=coordinates, 
-                           author_id=author_id)
-    db.session.add(new_request)
-    db.session.commit()
+
     
-def get_request(request_id):
-    return Requests.query.get(int(request_id))
+
 
 def set_request_status(request_id, status_id):
     request = Requests.query.get(int(request_id))

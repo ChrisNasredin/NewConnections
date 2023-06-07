@@ -1,30 +1,14 @@
 from . import app
 from flask import render_template, url_for, flash, redirect, request
 from .forms import LoginForm, RegisterForm, StatusForm, NewRequestForm, ChangeRequestForm
-from .services import create_new_user, get_statuses, add_status, user_autentification, get_dataset, \
-    create_new_request, get_request, set_request_status, delete_request, save
+from .services import get_statuses, add_status, get_dataset, \
+    set_request_status, delete_request, save
 from flask_login import current_user, login_user, logout_user
+from .services import UserService, RequestService
+from .views import IndexView, NewView
 
-@app.route('/')
-def index():
-    dataset = get_dataset()
-    return render_template('index.html', 
-                           title='Главная', 
-                           dataset=dataset)
-
-@app.route('/new', methods=['GET', 'POST'])
-def new():
-    form = NewRequestForm()
-    print(form.validate_on_submit())
-    if form.validate_on_submit():
-        create_new_request(address=form.address.data,
-                           name=form.name.data,
-                           phone=form.phone.data,
-                           coordinates=form.coordinates.data,
-                           author_id=current_user.id)
-        flash('Заявка успешно создана', 'success')
-        return redirect(url_for('index'))
-    return render_template('new.html', form=form)
+app.add_url_rule('/', view_func=IndexView.as_view('index'))
+app.add_url_rule('/new', view_func=NewView.as_view('new'))
     
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -32,8 +16,9 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = LoginForm()
+    user_service = UserService()
     if form.validate_on_submit():
-        user = user_autentification(form.username.data, form.password.data)
+        user = user_service.user_autentification(form.username.data, form.password.data)
         if user:
             login_user(user, remember=form.remember.data)
             return redirect(url_for('index'))
@@ -52,9 +37,10 @@ def logout():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
+    user_service = UserService()
     if form.validate_on_submit():
         print(form.validate_on_submit())
-        create_new_user(username=form.username.data,
+        user_service.create_new_user(username=form.username.data,
                         password=form.password.data,
                         role=form.role.raw_data[0])
     return render_template('register.html', form=form, title='Регистрация нового пользователя')
@@ -74,7 +60,8 @@ def admin_panel():
 
 @app.route('/request/<request_id>', methods=['GET','POST'])
 def show_request(request_id):
-    data = get_request(request_id)
+    request_service = RequestService
+    data = request_service.get_request(request_id)
     form = ChangeRequestForm()
     form.address.data = data.address
     form.name.data = data.name
