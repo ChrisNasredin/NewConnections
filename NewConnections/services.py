@@ -1,3 +1,4 @@
+import sys
 from . import db
 from .models import Users, Statuses, Requests
 from flask_login import current_user, login_user, logout_user
@@ -31,30 +32,64 @@ class RequestService:
     def get_request(self, request_id):
         return Requests.query.get(int(request_id))
     
-def get_statuses():
-    return Statuses.query.all()
-
-def add_status(status_name):
-    new_status = Statuses(status_desc=status_name)
-    db.session.add(new_status)
-    db.session.commit()
+    def delete_request(self, request_id):
+        request = Requests.query.get(int(request_id))
+        db.session.delete(request)
+        db.session.commit()
     
-def get_dataset():
-    return Requests.query.all()
-
-
+    def get_all(self):
+        return Requests.query.all()
     
+    def set_request_status(self, request_id, status_id):
+        request = Requests.query.get(int(request_id))
+        request.status_id=int(status_id)
+        db.session.commit()
+    
+class AdminPanel():
+    
+    category = {
+                    'users': None,
+                    'statuses': None,
+                }
+
+class StatusService:
+    
+    def get_statuses(self):
+        return Statuses.query.all()
+
+    def add_status(self, status_name):
+        new_status = Statuses(status_desc=status_name)
+        db.session.add(new_status)
+        db.session.commit()
 
 
-def set_request_status(request_id, status_id):
-    request = Requests.query.get(int(request_id))
-    request.status_id=int(status_id)
-    db.session.commit()
+class CRUD:
+    def __init__(self, model) -> None:
+        
+        self.model = getattr(sys.modules[__name__], model)
+        
+    def create(self, **kwargs):
+        instance = self.model(**kwargs)
+        db.session.add()
+        db.session.commit()
+        return instance
+    
+    def read(self, id='all', filter=None):
+        if id == 'all' and filter == None:
+            return self.model.query.all()
+        return self.model.query.get(int(id))
 
-def delete_request(request_id):
-    request = Requests.query.get(int(request_id))
-    db.session.delete(request)
-    db.session.commit()
+    def update(self, instance, field, value):
+        instance.field = value
+        db.session.commit()
+    
+    def delete(self, instance): 
+        db.session.delete(instance)
+        db.session.commit()
+        
+        
+        
+
 
 def save():
     db.session.commit()
