@@ -13,7 +13,7 @@ app.add_url_rule('/logout', view_func=LogoutView.as_view('logout'))
 app.add_url_rule('/admin/create_user', view_func=CreateNewUserView.as_view('create_user'))
 app.add_url_rule('/admin', view_func=AdminView.as_view('admin_panel'))
 app.add_url_rule('/request/<request_id>', view_func=AdminView.as_view('request_item'))
-app.add_url_rule('/request/<request_id>/<crud_action>', view_func=CRUDRequestView.as_view('request_crud'))
+app.add_url_rule('/<model>/<request_id>/<crud_action>', view_func=CRUDRequestView.as_view('crud'))
 
 @app.route('/request/<request_id>', methods=['GET','POST'])
 def show_request(request_id):
