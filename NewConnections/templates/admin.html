@@ -8,6 +8,7 @@
     <a href="">Выход</a>
 </nav>
     <h1>Панель администратора</h1>
+
     <h2>Статусы</h2>
     {% if statuses %}
         {% for status in statuses %}
@@ -24,4 +25,9 @@
         {{ form_add_status.status_desc }}</p>
         <p>{{ form_add_status.submit }}</p>
     </form>
+
+    <h2>Пользователи</h2>
+    {% for item in users %}
+        
+    {% endfor %}
 {% endblock content %}

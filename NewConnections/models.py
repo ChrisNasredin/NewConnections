@@ -30,10 +30,6 @@ class Roles(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     role_desc = db.Column(db.String(256))
     
-    @classmethod
-    def choice_roles(cls):
-        return cls.query.all()
-    
     def __repr__(self):
         return self.role_desc
     
@@ -41,10 +37,6 @@ class Statuses(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     status_desc = db.Column(db.String(256))
     requests = db.relationship('Requests', backref='status', lazy='dynamic')
-    
-    @classmethod
-    def get_statuses(cls):
-        return cls.query.all()
         
     
     def __repr__(self):
@@ -60,6 +52,23 @@ class Requests(db.Model):
     timestap = db.Column(db.DateTime, default=datetime.now)
     status_id = db.Column(db.Integer, db.ForeignKey('statuses.id'), default=1)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    connection_type = db.Column(db.String(256), index=True, nullable=True)
+    device_id = db.Column(db.Integer, db.ForeignKey('devices.id'))
+    base = db.Column(db.String(256), index=True, nullable=True)
+    comments = db.relationship('Comments', backref='request', lazy='dynamic')
+
+class Devices(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    vendor_id = db.Column(db.Integer, db.ForeignKey('vendors.id'))
+    name = db.Column(db.String(256), index=True)
     
+class Vendors(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(256), index=True)
+    devices = db.relationship('Devices', backref='vendor', lazy='dynamic')
     
-    
+class Comments(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String(256))
+    timestamp = db.Column(db.DateTime, default=datetime.now)
+    request_id = db.Column(db.Integer, db.ForeignKey('requests.id'))

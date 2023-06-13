@@ -1,6 +1,6 @@
 import sys
 from . import db
-from .models import Users, Statuses, Requests
+from .models import Users, Statuses, Requests, Roles
 from flask_login import current_user, login_user, logout_user
 
 class UserService:
@@ -17,6 +17,9 @@ class UserService:
             return user
         else:
             return False
+        
+    def get_roles(self):
+        return Roles.query.all()
     
 class RequestService:
     def create_new_request(self, address, name, phone, coordinates, author_id):
@@ -62,30 +65,6 @@ class StatusService:
         db.session.add(new_status)
         db.session.commit()
 
-
-class CRUD:
-    def __init__(self, model) -> None:
-        
-        self.model = getattr(sys.modules[__name__], model)
-        
-    def create(self, **kwargs):
-        instance = self.model(**kwargs)
-        db.session.add()
-        db.session.commit()
-        return instance
-    
-    def read(self, id='all', filter=None):
-        if id == 'all' and filter == None:
-            return self.model.query.all()
-        return self.model.query.get(int(id))
-
-    def update(self, instance, field, value):
-        instance.field = value
-        db.session.commit()
-    
-    def delete(self, instance): 
-        db.session.delete(instance)
-        db.session.commit()
         
         
         

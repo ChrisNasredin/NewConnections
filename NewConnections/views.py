@@ -1,7 +1,7 @@
-from flask import render_template, redirect, flash, typing as ft, url_for
+from flask import render_template, redirect, flash, typing as ft, url_for, request
 from flask_login import login_required, current_user, login_user, logout_user
 from flask.views import View
-from .services import UserService, RequestService, StatusService, CRUD
+from .services import UserService, RequestService, StatusService, save
 from .forms import RegisterForm, NewRequestForm, LoginForm, StatusForm, ChangeRequestForm
 
 class LoginRequiredMixin:
@@ -62,7 +62,7 @@ class CreateNewUserView(View):
     
     methods=['GET', 'POST']
     
-    def dispatch_request():
+    def dispatch_request(self):
         form = RegisterForm()
         user_service = UserService()
         if form.validate_on_submit():
@@ -74,9 +74,9 @@ class CreateNewUserView(View):
 
 class AdminView(View):
     
-    methods = ['GET, POST']
+    methods = ['GET', 'POST']
     
-    def dispatch_request():
+    def dispatch_request(self):
         status_service = StatusService()
         form_add_status = StatusForm()
         if form_add_status.validate_on_submit():
@@ -104,15 +104,45 @@ class RequestView(View):
         form.status.data=data.status
         return render_template('show_request.html', data=data, form=form)
 
-class CRUDRequestView(View):
+
+class DeleteRequestView(View):
     
     methods = ['GET', 'POST']
     
-    def dispatch_request(self, request_id, crud_action):
-        crud = CRUD('Requests')
-        instance = crud.read(id=request_id)
-        action = getattr(crud, str(crud_action))
-        print(type(action), action)
-        action(instance)
-        return redirect(url_for('index'))
+    def dispatch_request(self, request_id):
+        request_service = RequestService()
+        if request.method == 'POST':
+            print(request.__dict__)
+            request_id = request.view_args['request_id']
+            request_service.delete_request(request_id=request_id)
+            flash(f'Заявка {request_id} удалена', 'success')
+            return redirect(url_for('index'))
+        elif request.method == 'GET':
+            return render_template('сonfirm.html', id=request_id)
+            
+
+class EditRequestView(View):
+    
+    methods = ['POST', 'GET']
         
+    def dispatch_request(self,request_id):
+        request_service = RequestService()
+        current_request = request_service.get_request(request_id=request_id)
+        form = ChangeRequestForm()
+        print(form.validate_on_submit())
+        if form.validate_on_submit():
+            current_request.address = form.address.data 
+            current_request.name = form.name.data
+            current_request.phone = form.phone.data 
+            current_request.coordinates = form.coordinates.data
+            current_request.status_id = form.status.raw_data[0]
+            save()
+            return redirect(url_for('request_item', request_id=request_id))
+        elif request.method == 'GET':
+            form.address.data = current_request.address
+            form.name.data = current_request.name
+            form.phone.data = current_request.phone
+            form.coordinates.data = current_request.coordinates
+            form.status.data=current_request.status
+            return render_template('edit.html', form=form)
+        return redirect(url_for('show_request', request_id=request_id))

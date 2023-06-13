@@ -3,6 +3,7 @@ from wtforms import StringField, BooleanField, PasswordField, SubmitField, Integ
 from wtforms.validators import DataRequired, EqualTo
 from wtforms_alchemy import QuerySelectMultipleField, QuerySelectField
 from.models import Roles, Statuses
+from .services import StatusService, UserService
 
 
 class LoginForm(FlaskForm):
@@ -12,14 +13,17 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Вход')
 
 class RegisterForm(FlaskForm):
-     username = StringField('Имя пользователя', validators=[DataRequired()])
-     password = PasswordField('Пароль', validators=[DataRequired()])
-     password2 = PasswordField('Повторить пароль', validators=[DataRequired(), EqualTo('password')])
-     role = QuerySelectField(query_factory=Roles.choice_roles, 
+    
+    user_service = UserService()
+    
+    username = StringField('Имя пользователя', validators=[DataRequired()])
+    password = PasswordField('Пароль', validators=[DataRequired()])
+    password2 = PasswordField('Повторить пароль', validators=[DataRequired(), EqualTo('password')])
+    role = QuerySelectField(query_factory=UserService.get_roles, 
                             allow_blank=False, 
                             label='Права'
                             )
-     submit = SubmitField('Регистрация')
+    submit = SubmitField('Регистрация')
      
 class StatusForm(FlaskForm):
     status_desc = StringField('Новый статус:', validators=[DataRequired()])
@@ -33,11 +37,14 @@ class NewRequestForm(FlaskForm):
     submit = SubmitField('Создать')
 
 class ChangeRequestForm(FlaskForm):
+    
+    status_service = StatusService()
+    
     address = StringField('Адрес подключения', validators=[DataRequired()])
     name = StringField('ФИО', validators=[DataRequired()])
     coordinates = StringField('Координаты')
-    phone = StringField('Телефон', validators=[DataRequired()])
-    status = QuerySelectField(query_factory=Statuses.get_statuses,
+    phone = StringField('Телефон', validators=[DataRequired()]) 
+    status = QuerySelectField(query_factory=status_service.get_statuses,
                               allow_blank=False,
                               label='Статус')
     submit = SubmitField('Изменить')
