@@ -8,7 +8,7 @@ class Users(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(256), info={'label': 'Имя Пользователя'})
     password_hash = db.Column(db.String(256))
-    role = db.Column(db.Integer, db.ForeignKey('roles.id'), info={'label': 'Роль'})
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), info={'label': 'Роль'})
     requests = db.relationship('Requests', backref='author', lazy='dynamic')
     
     def set_password(self, password):
@@ -28,23 +28,16 @@ def load_user(id):
     
 class Roles(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    role_desc = db.Column(db.String(256))
-    
-    @classmethod
-    def choice_roles(cls):
-        return cls.query.all()
+    name = db.Column(db.String(256))
+    users = db.relationship('Users', backref='role', lazy='dynamic')
     
     def __repr__(self):
-        return self.role_desc
+        return self.name
     
 class Statuses(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     status_desc = db.Column(db.String(256))
     requests = db.relationship('Requests', backref='status', lazy='dynamic')
-    
-    @classmethod
-    def get_statuses(cls):
-        return cls.query.all()
         
     
     def __repr__(self):
@@ -60,6 +53,28 @@ class Requests(db.Model):
     timestap = db.Column(db.DateTime, default=datetime.now)
     status_id = db.Column(db.Integer, db.ForeignKey('statuses.id'), default=1)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    connection_type = db.Column(db.String(256), index=True, nullable=True)
+    device_id = db.Column(db.Integer, db.ForeignKey('devices.id'), nullable=True)
+    base = db.Column(db.String(256), index=True, nullable=True)
+    auth_type = db.Column(db.String(256), index=True, nullable=True)
+    comments = db.relationship('Comments', backref='request', lazy='dynamic')
+
+class Devices(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    vendor_id = db.Column(db.Integer, db.ForeignKey('vendors.id'))
+    name = db.Column(db.String(256), index=True)
+    
+class Vendors(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(256), index=True)
+    devices = db.relationship('Devices', backref='vendor', lazy='dynamic')
+    
+    def __repr__(self):
+        return self.name
     
     
-    
+class Comments(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String(256))
+    timestamp = db.Column(db.DateTime, default=datetime.now)
+    request_id = db.Column(db.Integer, db.ForeignKey('requests.id'))

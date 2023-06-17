@@ -8,6 +8,7 @@
     <a href="">Выход</a>
 </nav>
     <h1>Панель администратора</h1>
+
     <h2>Статусы</h2>
     {% if statuses %}
         {% for status in statuses %}
@@ -24,4 +25,23 @@
         {{ form_add_status.status_desc }}</p>
         <p>{{ form_add_status.submit }}</p>
     </form>
+
+    <h2>Пользователи</h2>
+    {% for user in users %}
+        <ul>
+            <li>Имя пользователя: {{ user.username }}, права: {{user.role}}</li>
+        </ul>
+    {% endfor %}
+    <h2>Устройства</h2>
+    {% for device in devices %}
+    <ul>
+        <li>Название устройства: {{ device.name }}, вендор: {{ device.vendor }}</li>
+    </ul>
+    {% endfor %}
+    <h2>Вендоры</h2>
+    {% for vendor in vendors %}
+    <ul>
+        <li>Название вендора: {{ vendor.name }}</li>
+    </ul>
+    {% endfor %}
 {% endblock content %}

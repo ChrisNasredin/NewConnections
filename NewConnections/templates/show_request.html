@@ -28,7 +28,7 @@
                 <td>{{ data.phone }}</td>
             </tr>
             <tr>
-                <td>Статус</td>
+                <td>Быстрые действия</td>
                 <td>
                     <form action="{{ url_for('edit_request', request_id=data.id)}}" method="post">
                         {{ form.csrf_token }}

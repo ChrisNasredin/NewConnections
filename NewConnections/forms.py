@@ -3,6 +3,7 @@ from wtforms import StringField, BooleanField, PasswordField, SubmitField, Integ
 from wtforms.validators import DataRequired, EqualTo
 from wtforms_alchemy import QuerySelectMultipleField, QuerySelectField
 from.models import Roles, Statuses
+from .services import StatusService, UserService, DeviceService
 
 
 class LoginForm(FlaskForm):
@@ -12,32 +13,52 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Вход')
 
 class RegisterForm(FlaskForm):
-     username = StringField('Имя пользователя', validators=[DataRequired()])
-     password = PasswordField('Пароль', validators=[DataRequired()])
-     password2 = PasswordField('Повторить пароль', validators=[DataRequired(), EqualTo('password')])
-     role = QuerySelectField(query_factory=Roles.choice_roles, 
+    
+    user_service = UserService()
+    
+    username = StringField('Имя пользователя', validators=[DataRequired()])
+    password = PasswordField('Пароль', validators=[DataRequired()])
+    password2 = PasswordField('Повторить пароль', validators=[DataRequired(), EqualTo('password')])
+    role = QuerySelectField(query_factory=UserService.get_roles, 
                             allow_blank=False, 
                             label='Права'
                             )
-     submit = SubmitField('Регистрация')
+    submit = SubmitField('Регистрация')
      
 class StatusForm(FlaskForm):
     status_desc = StringField('Новый статус:', validators=[DataRequired()])
     submit = SubmitField('Добавить статус')
+    
+class DeviceForm(FlaskForm):
+    device_name = StringField('Название устройства', validators=[DataRequired()])
+    vendor_id = QuerySelectField(query_factory=DeviceService.get_all_vendors,
+                                 allow_blank=True, 
+                                 label='Вендор')
+    submit = SubmitField('Добавить устройство')
+    
+class VendorForm(FlaskForm):
+    vendor_name = StringField('Имя вендора', validators=[DataRequired()])
+    submit = SubmitField('Добавить вендора')
     
 class NewRequestForm(FlaskForm):
     address = StringField('Адрес подключения', validators=[DataRequired()])
     name = StringField('ФИО', validators=[DataRequired()])
     coordinates = StringField('Координаты')
     phone = StringField('Телефон', validators=[DataRequired()])
+    device = StringField('Оборудование')
+    base = StringField('Базовая станция')
+    auth = StringField('Тип Авторизации')
     submit = SubmitField('Создать')
 
 class ChangeRequestForm(FlaskForm):
+    
+    status_service = StatusService()
+    
     address = StringField('Адрес подключения', validators=[DataRequired()])
     name = StringField('ФИО', validators=[DataRequired()])
     coordinates = StringField('Координаты')
-    phone = StringField('Телефон', validators=[DataRequired()])
-    status = QuerySelectField(query_factory=Statuses.get_statuses,
+    phone = StringField('Телефон', validators=[DataRequired()]) 
+    status = QuerySelectField(query_factory=status_service.get_statuses,
                               allow_blank=False,
                               label='Статус')
     submit = SubmitField('Изменить')

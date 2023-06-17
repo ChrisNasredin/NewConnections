@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3>Вы действительно хотите удалить заявку?</h3>
+    <form action="{{ url_for('delete_request', request_id=id) }}" method="post">
+        <input type="hidden" name="request_id" value="{{ request_id }}">
+        <input type="submit" value="Удалить">
+        <a href="{{ url_for('index') }}">Назад</a>
+    </form>
+        
+{% endblock content %}
