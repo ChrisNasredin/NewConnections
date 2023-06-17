@@ -27,7 +27,21 @@
     </form>
 
     <h2>Пользователи</h2>
-    {% for item in users %}
-        
+    {% for user in users %}
+        <ul>
+            <li>Имя пользователя: {{ user.username }}, права: {{user.role}}</li>
+        </ul>
+    {% endfor %}
+    <h2>Устройства</h2>
+    {% for device in devices %}
+    <ul>
+        <li>Название устройства: {{ device.name }}, вендор: {{ device.vendor }}</li>
+    </ul>
+    {% endfor %}
+    <h2>Вендоры</h2>
+    {% for vendor in vendors %}
+    <ul>
+        <li>Название вендора: {{ vendor.name }}</li>
+    </ul>
     {% endfor %}
 {% endblock content %}

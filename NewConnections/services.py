@@ -1,6 +1,6 @@
 import sys
 from . import db
-from .models import Users, Statuses, Requests, Roles
+from .models import Users, Statuses, Requests, Roles, Vendors, Devices
 from flask_login import current_user, login_user, logout_user
 
 class UserService:
@@ -20,6 +20,9 @@ class UserService:
         
     def get_roles(self):
         return Roles.query.all()
+    
+    def get_all_users(self):
+        return Users.query.all()
     
 class RequestService:
     def create_new_request(self, address, name, phone, coordinates, author_id):
@@ -65,7 +68,13 @@ class StatusService:
         db.session.add(new_status)
         db.session.commit()
 
+class DeviceService:
         
+        def get_all_vendors(self):
+            return Vendors.query.all()
+        
+        def get_all_devices(self):
+            return Devices.query.all()
         
         
 

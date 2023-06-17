@@ -1,8 +1,10 @@
 from flask import render_template, redirect, flash, typing as ft, url_for, request
 from flask_login import login_required, current_user, login_user, logout_user
 from flask.views import View
-from .services import UserService, RequestService, StatusService, save
-from .forms import RegisterForm, NewRequestForm, LoginForm, StatusForm, ChangeRequestForm
+from .services import UserService, RequestService, StatusService, save, DeviceService
+from .forms import RegisterForm, NewRequestForm, LoginForm, StatusForm, ChangeRequestForm, \
+    DeviceForm, VendorForm
+    
 
 class LoginRequiredMixin:
     
@@ -77,8 +79,15 @@ class AdminView(View):
     methods = ['GET', 'POST']
     
     def dispatch_request(self):
+        user_service = UserService()
+        device_service = DeviceService()
         status_service = StatusService()
         form_add_status = StatusForm()
+        form_add_device = DeviceForm()
+        form_add_vendor = VendorForm()
+        users = user_service.get_all_users()
+        devices = device_service.get_all_devices()
+        vendors = device_service.get_all_vendors()
         if form_add_status.validate_on_submit():
             status_service.add_status(form_add_status.status_desc.data)
             flash('Статус успешно добавлен')
@@ -86,7 +95,12 @@ class AdminView(View):
         statuses = status_service.get_statuses()
         return render_template('admin.html', 
                         form_add_status=form_add_status,
-                        statuses=statuses
+                        form_add_device=form_add_device,
+                        form_add_vendor=form_add_vendor,
+                        devices=devices,
+                        vendors=vendors,
+                        statuses=statuses, 
+                        users=users
                         )
 class RequestView(View):
     
