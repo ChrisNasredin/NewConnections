@@ -2,8 +2,8 @@ from flask import render_template, redirect, flash, typing as ft, url_for, reque
 from flask_login import login_required, current_user, login_user, logout_user
 from flask.views import View
 from .services import UserService, RequestService, StatusService, save, DeviceService
-from .forms import RegisterForm, NewRequestForm, LoginForm, StatusForm, ChangeRequestForm, \
-    DeviceForm, VendorForm
+from .forms import RegisterForm, NewRequestForm, LoginForm, ChangeRequestForm, \
+    DeviceForm, AddStatusForm, AddVendorForm
     
 
 class LoginRequiredMixin:
@@ -71,7 +71,7 @@ class CreateNewUserView(View):
             print(form.validate_on_submit())
             user_service.create_new_user(username=form.username.data,
                             password=form.password.data,
-                            role=form.role.raw_data[0])
+                            role=form.role.raw_data[0]  )
         return render_template('register.html', form=form, title='Регистрация нового пользователя')
 
 class AdminView(View):
@@ -82,17 +82,32 @@ class AdminView(View):
         user_service = UserService()
         device_service = DeviceService()
         status_service = StatusService()
-        form_add_status = StatusForm()
+        form_add_status = AddStatusForm()
         form_add_device = DeviceForm()
-        form_add_vendor = VendorForm()
+        form_add_vendor = AddVendorForm()
         users = user_service.get_all_users()
         devices = device_service.get_all_devices()
         vendors = device_service.get_all_vendors()
-        if form_add_status.validate_on_submit():
-            status_service.add_status(form_add_status.status_desc.data)
-            flash('Статус успешно добавлен')
-            
         statuses = status_service.get_statuses()
+        
+        if form_add_status.submit_status.data and form_add_status.validate_on_submit():
+            status_service.add_status(form_add_status.item_status.data)
+            form_add_status.item_status.data = ''
+            flash('Статус успешно добавлен')
+            return redirect(url_for('admin_panel'))
+            
+        if form_add_vendor.submit_vendor.data and form_add_vendor.validate_on_submit():
+            device_service.add_vendor(form_add_vendor.item_vendor.data)
+            form_add_vendor.item_vendor.data = ''
+            flash('Вендор успешно добавлен')
+            return redirect(url_for('admin_panel'))
+            
+        if form_add_device.submit_device.data and form_add_device.validate_on_submit():
+            device_service.add_device(form_add_device.item_device.data, form_add_device.vendor_id.raw_data[0])
+            form_add_device.item_device.data = ''
+            flash('Устройство успешно добавлено')
+            return redirect(url_for('admin_panel'))
+            
         return render_template('admin.html', 
                         form_add_status=form_add_status,
                         form_add_device=form_add_device,
@@ -102,6 +117,38 @@ class AdminView(View):
                         statuses=statuses, 
                         users=users
                         )
+        
+class AdminViewDeviceDelete(View):
+    
+    methods = ['POST', 'GET']
+    
+    def dispatch_request(self):
+        if request.method == 'POST':
+            device_service = DeviceService()
+            device_service.delete_device(request.form['id'])
+        return redirect(url_for('admin_panel'))
+
+class AdminViewStatusDelete(View):
+    
+    methods = ['POST', 'GET']
+    
+    def dispatch_request(self):
+        if request.method == 'POST':
+            status_service = StatusService()
+            status_service.delete_status(request.form['id'])
+        return redirect(url_for('admin_panel'))
+            
+class AdminViewVendorDelete(View):
+    
+    methods = ['POST', 'GET']
+    
+    def dispatch_request(self):
+        if request.method == 'POST':
+            status_service = DeviceService()
+            status_service.delete_vendor(request.form['id'])
+        return redirect(url_for('admin_panel'))
+
+
 class RequestView(View):
     
     methods = ['GET', 'POST']

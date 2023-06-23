@@ -58,6 +58,7 @@ class Requests(db.Model):
     base = db.Column(db.String(256), index=True, nullable=True)
     auth_type = db.Column(db.String(256), index=True, nullable=True)
     comments = db.relationship('Comments', backref='request', lazy='dynamic')
+    source_id = db.Column(db.Integer, db.ForeignKey('sources.id'), nullable=True)
 
 class Devices(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -72,9 +73,15 @@ class Vendors(db.Model):
     def __repr__(self):
         return self.name
     
+class Sources(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(256), index=True)
+    requests = db.relationship('Requests', backref='status', lazy='dynamic')
+    
     
 class Comments(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(256))
     timestamp = db.Column(db.DateTime, default=datetime.now)
     request_id = db.Column(db.Integer, db.ForeignKey('requests.id'))
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))

@@ -6,7 +6,8 @@ from flask_login import current_user, login_user, logout_user
 class UserService:
     
     def create_new_user(self, username, password, role):
-        new_user = Users(username=username, role=role)
+        print(role)
+        new_user = Users(username=username, role_id=role)
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
@@ -20,6 +21,9 @@ class UserService:
         
     def get_roles(self):
         return Roles.query.all()
+    
+    def get_role(self, id):
+        Roles.query.get(int(id)) 
     
     def get_all_users(self):
         return Users.query.all()
@@ -67,6 +71,11 @@ class StatusService:
         new_status = Statuses(status_desc=status_name)
         db.session.add(new_status)
         db.session.commit()
+        
+    def delete_status(self, id):
+        status = Statuses.query.get(int(id)) 
+        db.session.delete(status)
+        db.session.commit()
 
 class DeviceService:
         
@@ -76,6 +85,25 @@ class DeviceService:
         def get_all_devices(self):
             return Devices.query.all()
         
+        def add_vendor(self, name):
+            new_vendor = Vendors(name=name)
+            db.session.add(new_vendor)
+            db.session.commit()
+            
+        def delete_vendor(self, id):
+            vendor = Vendors.query.get(int(id)) 
+            db.session.delete(vendor)
+            db.session.commit()
+            
+        def add_device(self, name, vendor):
+            new_device = Devices(name=name, vendor_id=vendor)
+            db.session.add(new_device)
+            db.session.commit()
+            
+        def delete_device(self, id):
+            device = Devices.query.get(int(id)) 
+            db.session.delete(device)
+            db.session.commit()
         
 
 

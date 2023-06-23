@@ -13,7 +13,11 @@
     {% if statuses %}
         {% for status in statuses %}
             <ul>
-                <li>{{ status }}</li>
+                <li><form action="{{ url_for('delete_status')}}" method="post">
+                    {{ status }}
+                    <input type="hidden" name="id" value="{{status.id}}">
+                    <button type="submit">Удалить</button>
+                </form></li>
             </ul>
         {% endfor %}
     {% else %}
@@ -21,9 +25,9 @@
     {% endif %}
     <form action="" method="post">
             {{ form_add_status.csrf_token }}
-        <p>{{ form_add_status.status_desc.label }}
-        {{ form_add_status.status_desc }}</p>
-        <p>{{ form_add_status.submit }}</p>
+        <p>{{ form_add_status.item_status.label }}
+        {{ form_add_status.item_status }}</p>
+        <p>{{ form_add_status.submit_status }}</p>
     </form>
 
     <h2>Пользователи</h2>
@@ -32,16 +36,48 @@
             <li>Имя пользователя: {{ user.username }}, права: {{user.role}}</li>
         </ul>
     {% endfor %}
+    <a href="{{ url_for('create_user')}}">Добавить пользователя</a>
     <h2>Устройства</h2>
     {% for device in devices %}
     <ul>
-        <li>Название устройства: {{ device.name }}, вендор: {{ device.vendor }}</li>
+        <li>
+            <form action="{{ url_for('delete_device')}}" method="post">
+                Название устройства: {{ device.name }}, вендор: {{ device.vendor }}
+                <input type="hidden" name="id" value="{{device.id}}">
+                <button type="submit">Удалить</button>
+            </form>
+        </li>
     </ul>
     {% endfor %}
+    <form action="" method="post">
+        {{ form_add_device.csrf_token }}
+        <p>
+            {{ form_add_device.item_device.label }}
+            {{ form_add_device.item_device }}
+        </p>
+        <p>
+            {{ form_add_device.vendor_id.label }}
+            {{ form_add_device.vendor_id }}
+        </p>
+        <p>{{ form_add_device.submit_device }}</p>
+    </form>
     <h2>Вендоры</h2>
     {% for vendor in vendors %}
     <ul>
-        <li>Название вендора: {{ vendor.name }}</li>
+        <li>
+            <form action="{{ url_for('delete_vendor')}}" method="post">
+            Название вендора: {{ vendor.name }}
+            <input type="hidden" name="id" value="{{vendor.id}}">
+            <button type="submit">Удалить</button>
+            </form>
+        </li>
     </ul>
     {% endfor %}
+    <form action="" method="post">
+        {{ form_add_vendor.csrf_token }}
+        <p>{{ form_add_vendor.item_vendor.label }}
+        {{ form_add_vendor.item_vendor }}</p>
+        <p>{{ form_add_vendor.submit_vendor }}</p>
+    </form>
+
 {% endblock content %}

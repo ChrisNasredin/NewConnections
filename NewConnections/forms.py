@@ -19,22 +19,29 @@ class RegisterForm(FlaskForm):
     username = StringField('Имя пользователя', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
     password2 = PasswordField('Повторить пароль', validators=[DataRequired(), EqualTo('password')])
-    role = QuerySelectField(query_factory=UserService.get_roles, 
+    role = QuerySelectField(query_factory=user_service.get_roles, 
                             allow_blank=False, 
-                            label='Права'
-                            )
+                            label='Права')
     submit = SubmitField('Регистрация')
      
-class StatusForm(FlaskForm):
-    status_desc = StringField('Новый статус:', validators=[DataRequired()])
-    submit = SubmitField('Добавить статус')
+class AddItemForm(FlaskForm):
+    pass
+    
+class AddStatusForm(AddItemForm):
+    item_status = StringField('Добавить новый:', validators=[DataRequired()])
+    submit_status = SubmitField('Добавить')
+    
+class AddVendorForm(AddItemForm):
+    item_vendor = StringField('Добавить новый:', validators=[DataRequired()])
+    submit_vendor = SubmitField('Добавить')
     
 class DeviceForm(FlaskForm):
-    device_name = StringField('Название устройства', validators=[DataRequired()])
-    vendor_id = QuerySelectField(query_factory=DeviceService.get_all_vendors,
+    device_service = DeviceService()
+    item_device = StringField('Название устройства', validators=[DataRequired()])
+    vendor_id = QuerySelectField(query_factory=device_service.get_all_vendors,
                                  allow_blank=True, 
                                  label='Вендор')
-    submit = SubmitField('Добавить устройство')
+    submit_device = SubmitField('Добавить устройство')
     
 class VendorForm(FlaskForm):
     vendor_name = StringField('Имя вендора', validators=[DataRequired()])
@@ -62,3 +69,7 @@ class ChangeRequestForm(FlaskForm):
                               allow_blank=False,
                               label='Статус')
     submit = SubmitField('Изменить')
+    
+class CommentForm(FlaskForm):
+    comment = StringField('Комментарий', validators=[DataRequired()])
+    submit_comment = SubmitField('Отправить комментарий')
