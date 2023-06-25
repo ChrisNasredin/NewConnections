@@ -1,6 +1,7 @@
 import sys
 from . import db
-from .models import Users, Statuses, Requests, Roles, Vendors, Devices
+from .models import Users, Statuses, Requests, Roles, Vendors, Devices, Comments, \
+    Sources
 from flask_login import current_user, login_user, logout_user
 
 class UserService:
@@ -29,10 +30,11 @@ class UserService:
         return Users.query.all()
     
 class RequestService:
-    def create_new_request(self, address, name, phone, coordinates, author_id):
+    def create_new_request(self, address, name, phone, source, coordinates, author_id):
         new_request = Requests(address=address, 
                             name=name, 
-                            phone=phone, 
+                            phone=phone,
+                            source_id=source, 
                             coordinates=coordinates, 
                             author_id=author_id)
         db.session.add(new_request)
@@ -54,6 +56,7 @@ class RequestService:
         request = Requests.query.get(int(request_id))
         request.status_id=int(status_id)
         db.session.commit()
+    
     
 class AdminPanel():
     
@@ -105,7 +108,27 @@ class DeviceService:
             db.session.delete(device)
             db.session.commit()
         
+class CommentService:
+    def add_comment(self, request_id, author_id, text):
+        comment = Comments(text=text,
+                           author_id=author_id,
+                           request_id=request_id)
+        db.session.add(comment)
+        db.session.commit()
 
+class SourceService:
+    def get_all_sources(self):
+            return Sources.query.all()
+    
+    def add_source(self, name):
+            new_source = Sources(name=name)
+            db.session.add(new_source)
+            db.session.commit()
+
+    def delete_source(self, id):
+            source = Sources.query.get(int(id)) 
+            db.session.delete(source)
+            db.session.commit()
 
 def save():
     db.session.commit()

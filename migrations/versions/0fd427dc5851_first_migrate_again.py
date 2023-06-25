@@ -1,8 +1,8 @@
-"""first
+"""First migrate, again
 
-Revision ID: 9424f7fd0609
+Revision ID: 0fd427dc5851
 Revises: 
-Create Date: 2023-06-14 16:24:05.331003
+Create Date: 2023-06-24 08:54:46.291468
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '9424f7fd0609'
+revision = '0fd427dc5851'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -23,6 +23,14 @@ def upgrade():
     sa.Column('name', sa.String(length=256), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('sources',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=256), nullable=True),
+    sa.PrimaryKeyConstraint('id')
+    )
+    with op.batch_alter_table('sources', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_sources_name'), ['name'], unique=False)
+
     op.create_table('statuses',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('status_desc', sa.String(length=256), nullable=True),
@@ -66,13 +74,17 @@ def upgrade():
     sa.Column('connection_type', sa.String(length=256), nullable=True),
     sa.Column('device_id', sa.Integer(), nullable=True),
     sa.Column('base', sa.String(length=256), nullable=True),
+    sa.Column('auth_type', sa.String(length=256), nullable=True),
+    sa.Column('source_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['author_id'], ['users.id'], ),
     sa.ForeignKeyConstraint(['device_id'], ['devices.id'], ),
+    sa.ForeignKeyConstraint(['source_id'], ['sources.id'], ),
     sa.ForeignKeyConstraint(['status_id'], ['statuses.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('requests', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_requests_address'), ['address'], unique=False)
+        batch_op.create_index(batch_op.f('ix_requests_auth_type'), ['auth_type'], unique=False)
         batch_op.create_index(batch_op.f('ix_requests_base'), ['base'], unique=False)
         batch_op.create_index(batch_op.f('ix_requests_connection_type'), ['connection_type'], unique=False)
         batch_op.create_index(batch_op.f('ix_requests_coordinates'), ['coordinates'], unique=False)
@@ -84,6 +96,8 @@ def upgrade():
     sa.Column('text', sa.String(length=256), nullable=True),
     sa.Column('timestamp', sa.DateTime(), nullable=True),
     sa.Column('request_id', sa.Integer(), nullable=True),
+    sa.Column('author_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['author_id'], ['users.id'], ),
     sa.ForeignKeyConstraint(['request_id'], ['requests.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -99,6 +113,7 @@ def downgrade():
         batch_op.drop_index(batch_op.f('ix_requests_coordinates'))
         batch_op.drop_index(batch_op.f('ix_requests_connection_type'))
         batch_op.drop_index(batch_op.f('ix_requests_base'))
+        batch_op.drop_index(batch_op.f('ix_requests_auth_type'))
         batch_op.drop_index(batch_op.f('ix_requests_address'))
 
     op.drop_table('requests')
@@ -112,5 +127,9 @@ def downgrade():
 
     op.drop_table('vendors')
     op.drop_table('statuses')
+    with op.batch_alter_table('sources', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_sources_name'))
+
+    op.drop_table('sources')
     op.drop_table('roles')
     # ### end Alembic commands ###

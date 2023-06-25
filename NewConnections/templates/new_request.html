@@ -36,6 +36,13 @@
              {% endfor %}
             </p>
             <p>
+                {{ form.source.label }}
+                {{ form.source }}
+                {% for error in form.source.errors %}
+                <span style="color: red">{{ error }}</span>
+             {% endfor %}
+            </p>
+            <p>
                 {{ form.coordinates.label }}
                 {{ form.coordinates }}
                 {% for error in form.coordinates.errors %}

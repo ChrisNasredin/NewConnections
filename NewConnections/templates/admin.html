@@ -79,5 +79,23 @@
         {{ form_add_vendor.item_vendor }}</p>
         <p>{{ form_add_vendor.submit_vendor }}</p>
     </form>
+    <h2>Источники</h2>
+    {% for source in sources %}
+    <ul>
+        <li>
+            <form action="{{ url_for('delete_source')}}" method="post">
+            Источник: {{ source.name }}
+            <input type="hidden" name="id" value="{{source.id}}">
+            <button type="submit">Удалить</button>
+            </form>
+        </li>
+    </ul>
+    {% endfor %}
+    <form action="" method="post">
+        {{ form_add_source.csrf_token }}
+        <p>{{ form_add_source.item_source.label }}
+        {{ form_add_source.item_source }}</p>
+        <p>{{ form_add_source.submit_source }}</p>
+    </form>
 
 {% endblock content %}

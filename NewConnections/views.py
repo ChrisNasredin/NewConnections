@@ -1,9 +1,11 @@
 from flask import render_template, redirect, flash, typing as ft, url_for, request
 from flask_login import login_required, current_user, login_user, logout_user
 from flask.views import View
-from .services import UserService, RequestService, StatusService, save, DeviceService
-from .forms import RegisterForm, NewRequestForm, LoginForm, ChangeRequestForm, \
-    DeviceForm, AddStatusForm, AddVendorForm
+from .services import UserService, RequestService, StatusService, save, DeviceService, CommentService, \
+    SourceService
+from .forms import RegisterForm, LoginForm, RequestForm, \
+    DeviceForm, AddStatusForm, AddVendorForm, CommentForm, AddSourceForm, \
+    SearchForm
     
 
 class LoginRequiredMixin:
@@ -13,28 +15,33 @@ class LoginRequiredMixin:
 class IndexView(LoginRequiredMixin,View):
     
     def dispatch_request(self):
+        search_form = SearchForm()
         request_service = RequestService()
         dataset = request_service.get_all()
         return render_template('index.html', 
                            title='Главная', 
-                           dataset=dataset)
+                           dataset=dataset,
+                           search_form=search_form)
         
 class NewRequestView(LoginRequiredMixin, View):
    
     methods=['GET', 'POST']
     
     def dispatch_request(self):
-        form = NewRequestForm()
+        form = RequestForm()
         request_service = RequestService()
+        print(form.validate_on_submit())
+        print(form.errors)
         if form.validate_on_submit():
             request_service.create_new_request(address=form.address.data,
                             name=form.name.data,
                             phone=form.phone.data,
+                            source=form.source.raw_data[0],
                             coordinates=form.coordinates.data,
                             author_id=current_user.id)
             flash('Заявка успешно создана', 'success')
             return redirect(url_for('index'))
-        return render_template('new.html', form=form)
+        return render_template('new_request.html', form=form)
     
 class LoginView(View):
     
@@ -85,10 +92,13 @@ class AdminView(View):
         form_add_status = AddStatusForm()
         form_add_device = DeviceForm()
         form_add_vendor = AddVendorForm()
+        form_add_source = AddSourceForm()
+        source_service = SourceService()
         users = user_service.get_all_users()
         devices = device_service.get_all_devices()
         vendors = device_service.get_all_vendors()
         statuses = status_service.get_statuses()
+        sources = source_service.get_all_sources()
         
         if form_add_status.submit_status.data and form_add_status.validate_on_submit():
             status_service.add_status(form_add_status.item_status.data)
@@ -107,14 +117,22 @@ class AdminView(View):
             form_add_device.item_device.data = ''
             flash('Устройство успешно добавлено')
             return redirect(url_for('admin_panel'))
+        
+        if form_add_source.submit_source.data and form_add_source.validate_on_submit():
+            source_service.add_source(form_add_source.item_source.data)
+            form_add_source.item_source.data = ''
+            flash('Вендор успешно добавлен')
+            return redirect(url_for('admin_panel'))
             
         return render_template('admin.html', 
                         form_add_status=form_add_status,
                         form_add_device=form_add_device,
                         form_add_vendor=form_add_vendor,
+                        form_add_source=form_add_source,
                         devices=devices,
                         vendors=vendors,
                         statuses=statuses, 
+                        sources=sources,
                         users=users
                         )
         
@@ -126,6 +144,16 @@ class AdminViewDeviceDelete(View):
         if request.method == 'POST':
             device_service = DeviceService()
             device_service.delete_device(request.form['id'])
+        return redirect(url_for('admin_panel'))
+    
+class AdminViewSourceDelete(View):
+    
+    methods = ['POST', 'GET']
+    
+    def dispatch_request(self):
+        if request.method == 'POST':
+            source_service = SourceService()
+            source_service.delete_source(request.form['id'])
         return redirect(url_for('admin_panel'))
 
 class AdminViewStatusDelete(View):
@@ -157,13 +185,16 @@ class RequestView(View):
         
         request_service = RequestService()
         data = request_service.get_request(request_id)
-        form = ChangeRequestForm()
+        form = RequestForm()
+        comment_form = CommentForm()
         form.address.data = data.address
         form.name.data = data.name
         form.phone.data = data.phone
+        form.source.data = data.source_id
         form.coordinates.data = data.coordinates
         form.status.data=data.status
-        return render_template('show_request.html', data=data, form=form)
+        
+        return render_template('show_request.html', data=data, form=form, comments=data.comments, comment_form=comment_form)
 
 
 class DeleteRequestView(View):
@@ -189,12 +220,16 @@ class EditRequestView(View):
     def dispatch_request(self,request_id):
         request_service = RequestService()
         current_request = request_service.get_request(request_id=request_id)
-        form = ChangeRequestForm()
+        form = RequestForm()
         print(form.validate_on_submit())
         if form.validate_on_submit():
             current_request.address = form.address.data 
             current_request.name = form.name.data
             current_request.phone = form.phone.data 
+            current_request.source_id = form.source.raw_data[0]
+            current_request.base = form.base.data
+            current_request.device = form.device.data
+            current_request.auth_type = form.auth_type.data
             current_request.coordinates = form.coordinates.data
             current_request.status_id = form.status.raw_data[0]
             save()
@@ -203,7 +238,28 @@ class EditRequestView(View):
             form.address.data = current_request.address
             form.name.data = current_request.name
             form.phone.data = current_request.phone
+            form.source.data=current_request.source
+            form.base.data=current_request.base
+            form.device.data=current_request.device
+            form.auth_type.data=current_request.auth_type
             form.coordinates.data = current_request.coordinates
             form.status.data=current_request.status
+            
             return render_template('edit.html', form=form)
         return redirect(url_for('show_request', request_id=request_id))
+    
+class AddCommentView(View):
+    
+    methods = ['POST']
+
+    def dispatch_request(self):
+        comment_form = CommentForm()
+        comment_service = CommentService()
+        if comment_form.validate_on_submit():
+            comment_service.add_comment(comment_form.request_id.data,
+                                        comment_form.author_id.data,
+                                        comment_form.comment_text.data
+                                        )
+            return redirect(url_for('request_item', request_id=comment_form.request_id.data))
+        else:
+            return redirect(url_for('index'))

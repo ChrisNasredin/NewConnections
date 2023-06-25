@@ -3,7 +3,7 @@
 {% block content %}
     <nav>
         <a href="{{ url_for('index') }}">Главная</a>
-        <a href="{{ url_for('new') }}">Создать заявку</a>
+        <a href="{{ url_for('new_request') }}">Создать заявку</a>
         {% if current_user.is_anonymous %}
             <a href="{{ url_for('login') }}">Вход</a>
         {% else %}
@@ -27,27 +27,59 @@
                 <td>Телефон</td>
                 <td>{{ data.phone }}</td>
             </tr>
+            {% if data.source_id %}
             <tr>
-                <td>Быстрые действия</td>
-                <td>
-                    <form action="{{ url_for('edit_request', request_id=data.id)}}" method="post">
-                        {{ form.csrf_token }}
-                        {{ form.address(type="hidden") }}
-                        {{ form.name(type="hidden") }}
-                        {{ form.phone(type="hidden") }}
-                        {{ form.coordinates(type="hidden") }}
-                        {{ form.status }}
-                        {{ form.submit }}
-                    </form>
-                </td>
+                <td>Источник</td>
+                <td>{{ data.source }}</td>
             </tr>
+        {% endif %}
+            {% if data.base %}
+                <tr>
+                    <td>База</td>
+                    <td>{{ data.base }}</td>
+                </tr>
+            {% endif %}
+            {% if data.device_id %}
+                <tr>
+                    <td>Оборудование</td>
+                    <td>{{ data.device }}</td>
+                </tr>
+            {% endif %}
+            {% if data.auth_type %}
+                <tr>
+                    <td>Тип авторизации</td>
+                    <td>{{ data.auth_type }}</td>
+                </tr>
+            {% endif %}
+            {% if data.coordinates %}
+                <tr>
+                    <td>Координаты</td>
+                    <td>{{ data.coordinates }}</td>
+                </tr>
+            {% endif %}
+           
+        
         </table>
+        <div class="actions">
+            <a href="{{ url_for('edit_request', request_id=data.id) }}">Изменить заявку</a>
+        </div>
         <div class="comments">
             <ul>
-                <li class="comment">
-                    
+                {% for comment in comments %}
+                <li class="comment"></li>
+                    {{ comment.text }}, автор {{ comment.author.username }}
                 </li>
+                {% endfor %}
             </ul>
+            <div class="add-comment">
+                <form action="{{url_for('add_comment')}}" method="post">
+                    {{ comment_form.csrf_token }}
+                    {{ comment_form.author_id(type="hidden", value=current_user.id) }}
+                    {{ comment_form.request_id(type="hidden", value=data.id) }}
+                    {{ comment_form.comment_text }}
+                    {{ comment_form.submit_comment }}
+                </form>
+            </div>
         </div>
     </div>
 {% endblock content %}

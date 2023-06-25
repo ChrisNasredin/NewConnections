@@ -3,7 +3,7 @@
 {% block content %}
 <nav>
     <i>Главная</i>
-    <a href="{{ url_for('new') }}">Создать заявку</a>
+    <a href="{{ url_for('new_request') }}">Создать заявку</a>
     {% if current_user.is_anonymous %}
         <a href="{{ url_for('login') }}">Вход</a>
     {% else %}
@@ -23,6 +23,75 @@
                 <td>Статус</td>
                 <td>Действия</td>
             </tr>
+            <div class="search">
+                <h3>Поиск</h3>
+                <form action="" method="get">
+                    <p>
+                        {{ search_form.address.label }}
+                        {{ search_form.address }}
+                        {% for error in search_form.address.errors %}
+                            <span style="color: red">{{ error }}</span>
+                         {% endfor %}
+                    </p>
+                    <p>
+                        {{ search_form.name.label }}
+                        {{ search_form.name }}
+                        {% for error in search_form.name.errors %}
+                            <span style="color: red">{{ error }}</span>
+                         {% endfor %}
+                    </p>
+                    <p>
+                        {{ search_form.phone.label }}
+                        {{ search_form.phone }}
+                        {% for error in search_form.phone.errors %}
+                            <span style="color: red">{{ error }}</span>
+                         {% endfor %}
+                    </p>
+                    <p>
+                        {{ search_form.source.label }}
+                        {{ search_form.source }}
+                        {% for error in search_form.source.errors %}
+                            <span style="color: red">{{ error }}</span>
+                         {% endfor %}
+                    </p>
+                    <p>
+                        {{ search_form.base.label }}
+                        {{ search_form.base }}
+                        {% for error in search_form.base.errors %}
+                            <span style="color: red">{{ error }}</span>
+                         {% endfor %}
+                    </p>
+                    <p>
+                        {{ search_form.device.label }}
+                        {{ search_form.device }}
+                        {% for error in search_form.device.errors %}
+                            <span style="color: red">{{ error }}</span>
+                         {% endfor %}
+                    </p>
+                    <p>
+                        {{ search_form.auth_type.label }}
+                        {{ search_form.auth_type }}
+                        {% for error in search_form.auth_type.errors %}
+                            <span style="color: red">{{ error }}</span>
+                         {% endfor %}
+                    </p>
+                    <p>
+                        {{ search_form.coordinates.label }}
+                        {{ search_form.coordinates }}
+                        {% for error in search_form.coordinates.errors %}
+                            <span style="color: red">{{ error }}</span>
+                         {% endfor %}
+                    </p>
+                    <p>
+                        {{ search_form.status.label }}
+                        {{ search_form.status }}
+                        {% for error in search_form.status.errors %}
+                            <span style="color: red">{{ error }}</span>
+                         {% endfor %}
+                    </p>
+                    <p>{{ search_form.submit(value='Поиск') }}</p>
+                </form>
+            </div>
             {% for request in dataset %}
             <tr>
                 <td>{{ request.address }}</td>
