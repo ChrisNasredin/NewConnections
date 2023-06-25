@@ -75,13 +75,7 @@
                             <span style="color: red">{{ error }}</span>
                          {% endfor %}
                     </p>
-                    <p>
-                        {{ search_form.coordinates.label }}
-                        {{ search_form.coordinates }}
-                        {% for error in search_form.coordinates.errors %}
-                            <span style="color: red">{{ error }}</span>
-                         {% endfor %}
-                    </p>
+                    <p>Дата с <input type="date" name="start-date"> по <input type="date" name="end-date"></p>
                     <p>
                         {{ search_form.status.label }}
                         {{ search_form.status }}
