@@ -58,7 +58,7 @@ class RequestService:
         request.status_id=int(status_id)
         db.session.commit()
 
-    def get_request_dataset(self, address, name, phone, source, base):
+    def get_request_dataset(self, address, name, phone, source, base, device, status,):
         
         request_dataset = Requests.query.filter(Requests.name.ilike(f'%{name}%'),
                                                 Requests.address.ilike(f'%{address}%'),
@@ -66,7 +66,6 @@ class RequestService:
                                                 Requests.base.ilike(f'%{base}%'))
         if source != '__None':
             request_dataset = request_dataset.filter(Requests.source_id == source)
-        
         
         return request_dataset.all()
 
