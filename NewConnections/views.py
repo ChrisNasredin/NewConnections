@@ -15,13 +15,33 @@ class LoginRequiredMixin:
 class IndexView(LoginRequiredMixin,View):
     
     def dispatch_request(self):
-        search_form = SearchForm()
         request_service = RequestService()
         dataset = request_service.get_all()
         return render_template('index.html', 
                            title='Главная', 
-                           dataset=dataset,
-                           search_form=search_form)
+                           dataset=dataset)
+class SearchView(View):
+
+    def dispatch_request(self):
+        search_form = SearchForm()
+        if request.method == 'GET' and request.args:
+            request_service = RequestService()
+            print(request.args.get('source'))
+            dataset = request_service.get_request_dataset(address=request.args.get('address'),
+                                                          name=request.args.get('name'),
+                                                          phone=request.args.get('phone'),
+                                                          source=request.args.get('source'),
+                                                          base=request.args.get('base') 
+                                                          )
+            print(request.args.get('name'))
+            print(type(request.args.get('name')))
+        else:
+            request_service = RequestService()
+            dataset = request_service.get_all()
+        return render_template('search.html', 
+                            title='Главная', 
+                            dataset=dataset,
+                            search_form=search_form)
         
 class NewRequestView(LoginRequiredMixin, View):
    

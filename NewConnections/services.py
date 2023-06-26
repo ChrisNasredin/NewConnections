@@ -3,6 +3,7 @@ from . import db
 from .models import Users, Statuses, Requests, Roles, Vendors, Devices, Comments, \
     Sources
 from flask_login import current_user, login_user, logout_user
+from sqlalchemy import or_
 
 class UserService:
     
@@ -56,6 +57,19 @@ class RequestService:
         request = Requests.query.get(int(request_id))
         request.status_id=int(status_id)
         db.session.commit()
+
+    def get_request_dataset(self, address, name, phone, source, base):
+        
+        request_dataset = Requests.query.filter(Requests.name.ilike(f'%{name}%'),
+                                                Requests.address.ilike(f'%{address}%'),
+                                                Requests.phone.ilike(f'%{phone}%'),
+                                                Requests.base.ilike(f'%{base}%'))
+        if source != '__None':
+            request_dataset = request_dataset.filter(Requests.source_id == source)
+        
+        
+        return request_dataset.all()
+
     
     
 class AdminPanel():

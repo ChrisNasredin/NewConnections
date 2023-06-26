@@ -1,7 +1,8 @@
 from . import app
 from .views import IndexView, NewRequestView, LoginView, LogoutView, CreateNewUserView, \
     AdminView, RequestView, DeleteRequestView, EditRequestView, AdminViewDeviceDelete, \
-    AdminViewStatusDelete, AdminViewVendorDelete, AddCommentView, AdminViewSourceDelete
+    AdminViewStatusDelete, AdminViewVendorDelete, AddCommentView, AdminViewSourceDelete, \
+    SearchView
 
 app.add_url_rule('/', view_func=IndexView.as_view('index'))
 app.add_url_rule('/new_request', view_func=NewRequestView.as_view('new_request'))
@@ -17,3 +18,4 @@ app.add_url_rule('/request/<request_id>', view_func=RequestView.as_view('request
 app.add_url_rule('/request/delete/<request_id>', view_func=DeleteRequestView.as_view('delete_request'))
 app.add_url_rule('/request/edit/<request_id>', view_func=EditRequestView.as_view('edit_request'))
 app.add_url_rule('/request/add_comment', view_func=AddCommentView.as_view('add_comment'))
+app.add_url_rule('/search', view_func=SearchView.as_view('search'))
