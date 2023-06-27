@@ -1,9 +1,16 @@
 import sys
 from . import db
 from .models import Users, Statuses, Requests, Roles, Vendors, Devices, Comments, \
-    Sources
+    Sources, Logs
 from flask_login import current_user, login_user, logout_user
 from sqlalchemy import or_
+
+def log(self, request_id, user, **kwargs):
+    note = f'{user} Редактирование заявки.'
+    log = Logs(request_id=request_id,
+                note=note)
+    db.session.add(log)
+    db.session.commit()
 
 class UserService:
     
@@ -153,6 +160,7 @@ class SourceService:
             source = Sources.query.get(int(id)) 
             db.session.delete(source)
             db.session.commit()
+    
 
 def save():
     db.session.commit()

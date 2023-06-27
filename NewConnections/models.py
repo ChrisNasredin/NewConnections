@@ -60,6 +60,7 @@ class Requests(db.Model):
     auth_type = db.Column(db.String(256), index=True, nullable=True)
     comments = db.relationship('Comments', backref='request', lazy='dynamic')
     source_id = db.Column(db.Integer, db.ForeignKey('sources.id'), nullable=True)
+    log = db.relationship('Logs', backref='request', lazy='dynamic')
 
 class Devices(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -93,3 +94,9 @@ class Comments(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.now)
     request_id = db.Column(db.Integer, db.ForeignKey('requests.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+class Logs(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    note = db.Column(db.String(512), index=True)
+    timestap = db.Column(db.DateTime, default=datetime.now)
+    request_id = db.Column(db.Integer, db.ForeignKey('requests.id'))
