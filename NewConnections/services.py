@@ -58,14 +58,25 @@ class RequestService:
         request.status_id=int(status_id)
         db.session.commit()
 
-    def get_request_dataset(self, address, name, phone, source, base, device, status,):
+    def get_request_dataset(self, address, name, phone, source, base, \
+                            device, status, start_date, end_date):
         
-        request_dataset = Requests.query.filter(Requests.name.ilike(f'%{name}%'),
+        request_dataset = Requests.query \
+            .filter(Requests.name.ilike(f'%{name}%'),
                                                 Requests.address.ilike(f'%{address}%'),
                                                 Requests.phone.ilike(f'%{phone}%'),
                                                 Requests.base.ilike(f'%{base}%'))
         if source != '__None':
             request_dataset = request_dataset.filter(Requests.source_id == source)
+
+        if status != '__None':
+            request_dataset = request_dataset.filter(Requests.status_id == status)
+
+        if device != '__None':
+            request_dataset = request_dataset.filter(Requests.device_id == device)
+        
+        if start_date and end_date:
+            request_dataset = request_dataset.filter(Requests.timestap >= start_date, Requests.timestap <= end_date)
         
         return request_dataset.all()
 

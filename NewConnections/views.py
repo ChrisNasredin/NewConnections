@@ -31,7 +31,11 @@ class SearchView(View):
                                                           name=request.args.get('name'),
                                                           phone=request.args.get('phone'),
                                                           source=request.args.get('source'),
-                                                          base=request.args.get('base') 
+                                                          base=request.args.get('base'),
+                                                          start_date=request.args.get('start-date'),
+                                                          end_date=request.args.get('end-date'),
+                                                          device=request.args.get('device'),
+                                                          status=request.args.get('status')
                                                           )
             print(request.args.get('name'))
             print(type(request.args.get('name')))
