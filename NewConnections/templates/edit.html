@@ -3,7 +3,7 @@
 {% block content %}
     <nav>
         <a href="{{ url_for('index') }}">Главная</a>
-        <a href="{{ url_for('new') }}">Создать заявку</a>
+        <a href="{{ url_for('new_request') }}">Создать заявку</a>
         {% if current_user.is_anonymous %}
             <a href="{{ url_for('login') }}">Вход</a>
         {% else %}
@@ -33,6 +33,34 @@
                 {{ form.phone.label }}
                 {{ form.phone }}
                 {% for error in form.phone.errors %}
+                    <span style="color: red">{{ error }}</span>
+                 {% endfor %}
+            </p>
+            <p>
+                {{ form.source.label }}
+                {{ form.source }}
+                {% for error in form.source.errors %}
+                    <span style="color: red">{{ error }}</span>
+                 {% endfor %}
+            </p>
+            <p>
+                {{ form.base.label }}
+                {{ form.base }}
+                {% for error in form.base.errors %}
+                    <span style="color: red">{{ error }}</span>
+                 {% endfor %}
+            </p>
+            <p>
+                {{ form.device.label }}
+                {{ form.device }}
+                {% for error in form.device.errors %}
+                    <span style="color: red">{{ error }}</span>
+                 {% endfor %}
+            </p>
+            <p>
+                {{ form.auth_type.label }}
+                {{ form.auth_type }}
+                {% for error in form.auth_type.errors %}
                     <span style="color: red">{{ error }}</span>
                  {% endfor %}
             </p>

@@ -3,11 +3,12 @@
 {% block content %}
 <nav>
     <i>Главная</i>
-    <a href="{{ url_for('new') }}">Создать заявку</a>
+    <a href="{{ url_for('new_request') }}">Создать заявку</a>
     {% if current_user.is_anonymous %}
         <a href="{{ url_for('login') }}">Вход</a>
     {% else %}
         <i>[{{ current_user.username }}]</i>
+        <a href="/search">Поиск</a>
         <a href="{{ url_for('logout') }}">Выход</a>
     {% endif %}
 </nav>

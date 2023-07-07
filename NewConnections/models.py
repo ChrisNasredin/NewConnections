@@ -10,7 +10,8 @@ class Users(UserMixin, db.Model):
     password_hash = db.Column(db.String(256))
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), info={'label': 'Роль'})
     requests = db.relationship('Requests', backref='author', lazy='dynamic')
-    
+    comments = db.relationship('Comments', backref='author', lazy='dynamic')
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
         
@@ -58,11 +59,17 @@ class Requests(db.Model):
     base = db.Column(db.String(256), index=True, nullable=True)
     auth_type = db.Column(db.String(256), index=True, nullable=True)
     comments = db.relationship('Comments', backref='request', lazy='dynamic')
+    source_id = db.Column(db.Integer, db.ForeignKey('sources.id'), nullable=True)
+    log = db.relationship('Logs', backref='request', lazy='dynamic')
 
 class Devices(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     vendor_id = db.Column(db.Integer, db.ForeignKey('vendors.id'))
     name = db.Column(db.String(256), index=True)
+    requests = db.relationship('Requests', backref='device', lazy='dynamic')
+
+    def __repr__(self):
+        return self.name
     
 class Vendors(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -72,9 +79,24 @@ class Vendors(db.Model):
     def __repr__(self):
         return self.name
     
+class Sources(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(256), index=True)
+    requests = db.relationship('Requests', backref='source', lazy='dynamic')
+
+    def __repr__(self):
+        return self.name
+    
     
 class Comments(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(256))
     timestamp = db.Column(db.DateTime, default=datetime.now)
+    request_id = db.Column(db.Integer, db.ForeignKey('requests.id'))
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+class Logs(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    note = db.Column(db.String(512), index=True)
+    timestap = db.Column(db.DateTime, default=datetime.now)
     request_id = db.Column(db.Integer, db.ForeignKey('requests.id'))
