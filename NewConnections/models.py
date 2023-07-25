@@ -6,7 +6,8 @@ from flask_login import UserMixin
 
 class Users(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(256), info={'label': 'Имя Пользователя'})
+    username = db.Column(db.String(256), info={'label': 'Логин Пользователя'})
+    real_name = db.Column(db.String(256), info={'label': 'ФИО Пользователя'})
     password_hash = db.Column(db.String(256))
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), info={'label': 'Роль'})
     requests = db.relationship('Requests', backref='author', lazy='dynamic')

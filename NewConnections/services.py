@@ -4,13 +4,13 @@ from .models import Users, Statuses, Requests, Roles, Vendors, Devices, Comments
     Sources, Logs
 from flask_login import current_user, login_user, logout_user
 from sqlalchemy import or_
+from werkzeug.security import check_password_hash, generate_password_hash
 
-def log(self, request_id, user, **kwargs):
-    note = f'{user} Редактирование заявки.'
-    log = Logs(request_id=request_id,
-                note=note)
-    db.session.add(log)
-    db.session.commit()
+class LogService:
+    def add_log(self, request_id, note):
+        new_log = Logs(request_id=request_id, note=note)
+        db.session.add(new_log)
+        db.session.commit()
 
 class UserService:
     
@@ -20,13 +20,14 @@ class UserService:
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
-        
+
     def user_autentification(self, username, password):
         user = Users.query.filter_by(username=username).first()
         if user and user.check_password(password):
             return user
         else:
             return False
+        
         
     def get_roles(self):
         return Roles.query.all()
@@ -38,6 +39,10 @@ class UserService:
         return Users.query.all()
     
 class RequestService:
+
+    def __init__(self):
+        self.logging = LogService()
+    
     def create_new_request(self, address, name, phone, source, coordinates, author_id):
         new_request = Requests(address=address, 
                             name=name, 
@@ -47,6 +52,7 @@ class RequestService:
                             author_id=author_id)
         db.session.add(new_request)
         db.session.commit()
+        self.logging.add_log(int(new_request.id), f'Заявка {int(new_request.id)} создана пользователем {current_user.username}')
         return 
     
     def get_request(self, request_id):
@@ -56,6 +62,7 @@ class RequestService:
         request = Requests.query.get(int(request_id))
         db.session.delete(request)
         db.session.commit()
+        self.logging.add_log(request.id, f'Заявка {request_id} удалена пользователем {current_user.username}')
     
     def get_all(self):
         return Requests.query.all()
@@ -86,6 +93,22 @@ class RequestService:
             request_dataset = request_dataset.filter(Requests.timestap >= start_date, Requests.timestap <= end_date)
         
         return request_dataset.all()
+
+    def edit_request(self, request_id, form):
+        current_request = Requests.query.get(int(request_id))
+        current_request.address = form.address.data 
+        current_request.name = form.name.data
+        current_request.phone = form.phone.data 
+        current_request.source_id = form.source.raw_data[0]
+        current_request.base = form.base.data
+        current_request.device = form.device.data
+        current_request.auth_type = form.auth_type.data
+        current_request.coordinates = form.coordinates.data
+        current_request.status_id = form.status.raw_data[0]
+        db.session.commit()
+        self.logging.add_log(current_request.id, f'Заявка {request_id} изменена пользователем {current_user.username}')
+
+        
 
     
     

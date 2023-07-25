@@ -243,20 +243,11 @@ class EditRequestView(View):
         
     def dispatch_request(self,request_id):
         request_service = RequestService()
-        current_request = request_service.get_request(request_id=request_id)
         form = RequestForm()
-        print(form.validate_on_submit())
+        current_request = request_service.get_request(request_id)
         if form.validate_on_submit():
-            current_request.address = form.address.data 
-            current_request.name = form.name.data
-            current_request.phone = form.phone.data 
-            current_request.source_id = form.source.raw_data[0]
-            current_request.base = form.base.data
-            current_request.device = form.device.data
-            current_request.auth_type = form.auth_type.data
-            current_request.coordinates = form.coordinates.data
-            current_request.status_id = form.status.raw_data[0]
-            save()
+            request_service.edit_request(request_id, form)
+            
             return redirect(url_for('request_item', request_id=request_id))
         elif request.method == 'GET':
             form.address.data = current_request.address
