@@ -41,6 +41,22 @@
             </tr>
             {% endfor %}
         </table>
-        
-    
+    <div>
+        {% if dataset.pages > 1 %}
+            {% if dataset.has_prev %}
+                <a href="{{ url_for('index', page=dataset.prev_num) }}"><<<</a>
+            {% endif %}
+            {% for iter_page in dataset.iter_pages() %}
+                {% if iter_page == dataset.page %}
+                    <i>{{ dataset.page }}</i>
+                {% else %}
+                    <a href="{{ url_for('index', page=iter_page) }}">{{ iter_page }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if dataset.has_next %}
+                <a href="{{ url_for('index', page=dataset.next_num) }}">>>></a>
+            {% endif %}
+        {% endif %}
+    </div>
 {% endblock content %}

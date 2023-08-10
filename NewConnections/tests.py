@@ -1,2 +1,2 @@
 if __name__ == '__main__': 
-    print('__name__')
+    def parametric_dec()

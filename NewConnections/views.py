@@ -10,23 +10,24 @@ from .forms import RegisterForm, LoginForm, RequestForm, \
 
 class LoginRequiredMixin:
     
-    decorators=[login_required]
+    decorators = [login_required]
 
 class IndexView(LoginRequiredMixin,View):
-    
+
     def dispatch_request(self):
+        page_num = int(request.args.get('page')) if request.args.get('page') else 1
         request_service = RequestService()
-        dataset = request_service.get_all()
+        dataset = request_service.get_all(page=page_num)
         return render_template('index.html', 
                            title='Главная', 
                            dataset=dataset)
+
 class SearchView(View):
 
     def dispatch_request(self):
         search_form = SearchForm()
         if request.method == 'GET' and request.args:
             request_service = RequestService()
-            print(request.args.get('source'))
             dataset = request_service.get_request_dataset(address=request.args.get('address'),
                                                           name=request.args.get('name'),
                                                           phone=request.args.get('phone'),
@@ -35,13 +36,13 @@ class SearchView(View):
                                                           start_date=request.args.get('start-date'),
                                                           end_date=request.args.get('end-date'),
                                                           device=request.args.get('device'),
-                                                          status=request.args.get('status')
+                                                          status=request.args.get('status'),
+                                                          page=request.args.get('page')
                                                           )
-            print(request.args.get('name'))
-            print(type(request.args.get('name')))
         else:
             request_service = RequestService()
-            dataset = request_service.get_all()
+            dataset = {}
+        # print(dataset.total)
         return render_template('search.html', 
                             title='Главная', 
                             dataset=dataset,
@@ -49,7 +50,7 @@ class SearchView(View):
         
 class NewRequestView(LoginRequiredMixin, View):
    
-    methods=['GET', 'POST']
+    methods = ['GET', 'POST']
     
     def dispatch_request(self):
         form = RequestForm()
@@ -241,7 +242,7 @@ class EditRequestView(View):
     
     methods = ['POST', 'GET']
         
-    def dispatch_request(self,request_id):
+    def dispatch_request(self, request_id):
         request_service = RequestService()
         form = RequestForm()
         current_request = request_service.get_request(request_id)

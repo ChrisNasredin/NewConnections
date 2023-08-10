@@ -63,6 +63,9 @@ class Requests(db.Model):
     source_id = db.Column(db.Integer, db.ForeignKey('sources.id'), nullable=True)
     log = db.relationship('Logs', backref='request', lazy='dynamic')
 
+    def __repr__(self):
+        return self.name
+
 class Devices(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     vendor_id = db.Column(db.Integer, db.ForeignKey('vendors.id'))
